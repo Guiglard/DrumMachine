@@ -7,15 +7,12 @@ import main.view.MainWindow;
 @SuppressWarnings("serial")
 public abstract class MainPanel extends JPanel {
 
-	private MainWindow mainWindow = null;
-	
-	public MainPanel(MainWindow mainWindow) {
-		this.mainWindow = mainWindow;
-		this.mainWindow.setContentPane(this);
-	}
-	
-	public void displayMe() {
-		mainWindow.displayPanel(this);
-	}
-	
+    public MainPanel() {
+        setPreferredSize(MainWindow.getInstance().getSize());
+    }
+
+    public void displayMe() {
+        MainWindow.getInstance().changePanel(this);
+    }
+
 }

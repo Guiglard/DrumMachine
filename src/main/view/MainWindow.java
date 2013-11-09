@@ -2,18 +2,18 @@ package main.view;
 
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
-import javax.swing.JPanel;
 
-import main.view.factory.MainPanelFactory;
 import main.view.menu.CommonMenu;
 import main.view.menu.DrumMachineMenu;
+import main.view.panel.DrumPanel;
+import main.view.panel.MainPanel;
 
 @SuppressWarnings("serial")
 public class MainWindow extends JFrame {
 
     private static MainWindow mainWindow = null;
     private JMenuBar menuBar = new JMenuBar();
-
+    private MainPanel currentPanel;
 
     public static MainWindow getInstance() {
         if (mainWindow == null) {
@@ -30,18 +30,24 @@ public class MainWindow extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    public void displayPanel(JPanel currentPanel) {
+    public void changePanel(MainPanel currentPanel) {
+        this.currentPanel = currentPanel;
         setContentPane(currentPanel);
+        pack();
         setVisible(true);
     }
 
-    public static void initMainWindow() {
-        getInstance().initMenuBar();
-        getInstance().displayPanel(MainPanelFactory.getDrumPanel());
+    public MainPanel getCurrentPanel() {
+        return currentPanel;
+    }
+
+    public void buildMainWindow() {
+        getInstance().buildMenuBar();
+        getInstance().changePanel(DrumPanel.getInstance());
         getInstance().setVisible(true);
     }
     
-    private void initMenuBar() {
+    private void buildMenuBar() {
         menuBar.add(CommonMenu.getInstance());
         menuBar.add(DrumMachineMenu.getInstance());
         this.setJMenuBar(menuBar);
