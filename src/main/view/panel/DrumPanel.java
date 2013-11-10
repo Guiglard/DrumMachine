@@ -4,7 +4,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
 import main.view.panel.drumpanel.DrumBottomPanel;
-import main.view.panel.drumpanel.DrumStartStopPanel;
+import main.view.panel.drumpanel.DrumMiddlePanel;
 import main.view.panel.drumpanel.DrumTopPanel;
 
 @SuppressWarnings("serial")
@@ -13,7 +13,7 @@ public class DrumPanel extends MainPanel {
     private static DrumPanel drumPanel = null;
     private GridBagConstraints gridBagConstraints = new GridBagConstraints();
     private DrumTopPanel drumTopPanel;
-    private DrumStartStopPanel drumStartStopPanel;
+    private DrumMiddlePanel drumStartStopPanel;
     private DrumBottomPanel drumBottomPanel;
     
     public static DrumPanel getInstance() {
@@ -26,7 +26,7 @@ public class DrumPanel extends MainPanel {
     private DrumPanel() {
         super();
         drumTopPanel = new DrumTopPanel(this);
-        drumStartStopPanel = new DrumStartStopPanel(this);
+        drumStartStopPanel = new DrumMiddlePanel(this);
         drumBottomPanel = new DrumBottomPanel(this);
         buildDrumPanel();
     }
@@ -63,7 +63,7 @@ public class DrumPanel extends MainPanel {
         return drumTopPanel;
     }
 
-    public DrumStartStopPanel getDrumStartStopPanel() {
+    public DrumMiddlePanel getDrumStartStopPanel() {
         return drumStartStopPanel;
     }
 

@@ -2,42 +2,25 @@ package main.model.sequence;
 
 import static javax.sound.midi.ShortMessage.NOTE_OFF;
 import static javax.sound.midi.ShortMessage.NOTE_ON;
+import static main.Utils.EventMakerUtil.makeEvent;
 
-import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiEvent;
-import javax.sound.midi.ShortMessage;
 
 /**
  * The drum beat is a sound happening at a precise tick on a given track.<br>
- * With each modification of the settings of the track or beat, the {@link MidiEvent} must be 
+ * With each modification of the settings of the track or beat, the {@link MidiEvent} must be regenerated.<br>
  */
 public class DrumBeat {
 
     private boolean isMuted = false;
     private int tick;
-    private DrumTrack drumTrack;
+    private DrumTrack drumTrack = null;
     private MidiEvent midiEventOn;
     private MidiEvent midiEventOff;
 
     public DrumBeat(DrumTrack drumTrack, int tick) {
+        this.tick = tick;
         this.drumTrack = drumTrack;
-        this.tick = tick;
-    }
-
-    public int getTick() {
-        return tick;
-    }
-
-    public void setTick(int tick) {
-        this.tick = tick;
-    }
-
-    public boolean isMuted() {
-        return isMuted;
-    }
-
-    public void setMuted(boolean muted) {
-        this.isMuted = muted;
     }
 
     public void generateEvent() {
@@ -77,19 +60,25 @@ public class DrumBeat {
         }
     }
 
-    /**
-     * @param command
-     *            NOTE_ON could be interpreted as the start of a note whereas
-     *            NOTE_OFF would be the release.
-     */
-    public static MidiEvent makeEvent(int command, int channel, int data1, int data2, int tick) {
-        ShortMessage a1 = new ShortMessage();
-        try {
-            a1.setMessage(command, channel, data1, data2);
-        } catch (InvalidMidiDataException e) {
-            e.printStackTrace();
-        }
-        return new MidiEvent(a1, tick);
+    public int getTick() {
+        return tick;
     }
 
+    public void setTick(int tick) {
+        this.tick = tick;
+    }
+
+    public boolean isMuted() {
+        return isMuted;
+    }
+
+    public void setMuted(boolean muted) {
+        this.isMuted = muted;
+        updateDrumBeatAfterChange();
+    }
+
+    private void updateDrumBeatAfterChange() {
+        generateEvent();
+    }
+    
 }

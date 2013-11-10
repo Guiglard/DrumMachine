@@ -56,4 +56,16 @@ public class DrumMachineView implements BeatObserver, BPMObserver {
         }
     }
 
+    @Override
+    public void updateStarted() {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void updateEnded() {
+        // TODO Auto-generated method stub
+        
+    }
+
 }

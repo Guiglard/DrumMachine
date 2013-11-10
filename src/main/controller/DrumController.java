@@ -15,12 +15,12 @@ public class DrumController {
         view.showView();
     }
 
-    public void start() {
-        model.on();
-    }
-
-    public void stop() {
-        model.off();
+    public void onOff() {
+        if (model.isRunning()) {
+            model.off();
+        } else {
+            model.on();
+        }
     }
 
 }

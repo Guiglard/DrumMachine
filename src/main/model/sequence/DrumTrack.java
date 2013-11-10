@@ -1,7 +1,11 @@
 package main.model.sequence;
 
+import static main.Utils.EventMakerUtil.makeEvent;
+import static main.Utils.EventMakerUtil.makeMetaEvent;
+
 import java.util.ArrayList;
 
+import javax.sound.midi.ShortMessage;
 import javax.sound.midi.Track;
 
 import main.model.DrumMachineModel;
@@ -14,14 +18,29 @@ public class DrumTrack {
 
     private Track track = null;
     private int channel = 9;
-    private int pitch = 40;
+    private int pitch = 36;
     private int volume = 100;
     private DrumMachineModel drumMachine;
     private ArrayList<DrumBeat> drumBeats = new ArrayList<>();
 
     public DrumTrack(DrumMachineModel drumMachine) {
         this.drumMachine = drumMachine;
-        resetTrack();
+        initTrack();
+    }
+
+    public DrumTrack(DrumMachineModel drumMachine, int volume, int pitch) {
+        this.volume = volume;
+        this.pitch = pitch;
+        this.drumMachine = drumMachine;
+        initTrack();
+    }
+
+    public DrumTrack(DrumMachineModel drumMachine, int volume, int pitch, boolean[] data) {
+        this.volume = volume;
+        this.pitch = pitch;
+        this.drumMachine = drumMachine;
+        initTrack();
+        muteDrumBeats(data);
     }
 
     /**
@@ -30,33 +49,54 @@ public class DrumTrack {
      * <li>Clears and recreates all {@link DrumBeat} ; 
      * <li>Generates every {@link DrumBeat}'s event ;
      */
-    public void resetTrack() {
+    public void initTrack() {
         drumMachine.getSequence().deleteTrack(track);
         track = drumMachine.getSequence().createTrack();
         clearDrumBeats();
         createDrumBeats();
         generateAllDrumBeatEvents();
+        addMandatoryEventAtEndOfTrack();
     }
 
     /*
-     * Generates every {@link DrumBeat}'s event.<br> 
-     * This method must be called after any modification on attributes such as : 
-     * <li>channel ; <li>pitch ; <li>volume ; <li>muted ;
+     * Generates every {@link DrumBeat}'s event.<br> This method must be called after any modification on attributes such as : <li>channel ; <li>pitch ; <li>volume ; <li>muted ;
      */
     public void generateAllDrumBeatEvents() {
         for (DrumBeat db : drumBeats) {
             db.generateEvent();
         }
     }
-    
-    private void createDrumBeats() {
-        for (int i = 0; i <= drumMachine.getTicksPerBeat(); i++) {
-            drumBeats.add(new DrumBeat(this, i));
-        }
-    }
 
     private void clearDrumBeats() {
         drumBeats.clear();
+    }
+
+    private void createDrumBeats() {
+        int absoluteTickPosition = 0;
+        for (int beat = 1; beat <= drumMachine.getBeatsPerBar(); beat++) {
+            for (int relativeTickPosition = 1; relativeTickPosition <= drumMachine.getTicksPerBeat(); relativeTickPosition++) {
+                drumBeats.add(new DrumBeat(this, absoluteTickPosition++));
+            }
+            addEndOfBeatEvent(absoluteTickPosition);
+        }
+    }
+
+    private void muteDrumBeats(boolean[] data) {
+        if (data != null) {
+            for (DrumBeat db : drumBeats) {
+                db.setMuted(data[db.getTick()]);
+            }
+        }
+    }
+
+    /** Adds an event on the track that can be captured by the metaListenner. */
+    private void addEndOfBeatEvent(int tick) {
+        track.add(makeMetaEvent(tick));
+    }
+
+    private void addMandatoryEventAtEndOfTrack() {
+        track.add(makeEvent(ShortMessage.PROGRAM_CHANGE, 9, 1, 0, drumMachine.getLengthOfBarInTicks()));
+
     }
 
     public Track getTrack() {
@@ -107,11 +147,11 @@ public class DrumTrack {
         drumBeats.get(drumBeatOnTick).setMuted(muted);
         updateDrumBeatsAfterChange();
     }
-    
+
     public int getTicksPerBeat() {
         return drumMachine.getTicksPerBeat();
     }
-    
+
     /** Forces the regeneration of all the drum beat's MidiEvent after a change on the settings. */
     private void updateDrumBeatsAfterChange() {
         generateAllDrumBeatEvents();
