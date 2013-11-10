@@ -1,7 +1,7 @@
 package main.view;
 
 import main.controller.DrumController;
-import main.model.BeatModel;
+import main.model.DrumMachineModel;
 import main.model.observer.BPMObserver;
 import main.model.observer.BeatObserver;
 import main.view.panel.DrumPanel;
@@ -9,7 +9,7 @@ import main.view.panel.MainPanel;
 
 public class DrumMachineView implements BeatObserver, BPMObserver {
 
-    private BeatModel beatModel;
+    private DrumMachineModel drumMachineModel;
     private DrumController drumController;
 
     private static DrumMachineView instance = null;
@@ -21,8 +21,8 @@ public class DrumMachineView implements BeatObserver, BPMObserver {
         throw new IllegalArgumentException("DrumMachineView not instanciated yet");
     }
 
-    public DrumMachineView(DrumController controller, BeatModel model) {
-        beatModel = model;
+    public DrumMachineView(DrumController controller, DrumMachineModel model) {
+        drumMachineModel = model;
         drumController = controller;
         instance = this;
         model.registerObserver((BeatObserver) this);
@@ -34,8 +34,8 @@ public class DrumMachineView implements BeatObserver, BPMObserver {
         w.buildMainWindow();
     }
 
-    public BeatModel getBeatModel() {
-        return beatModel;
+    public DrumMachineModel getBeatModel() {
+        return drumMachineModel;
     }
 
     public DrumController getDrumController() {

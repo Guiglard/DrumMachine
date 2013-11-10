@@ -1,90 +1,113 @@
 package main.model;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
+import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MetaEventListener;
 import javax.sound.midi.MetaMessage;
-import javax.sound.midi.MidiEvent;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Sequence;
+import javax.sound.midi.Sequencer;
 import javax.sound.midi.ShortMessage;
 
 import main.model.observer.BPMObserver;
 import main.model.observer.BeatObserver;
+import main.model.sequence.DrumBeat;
+import main.model.sequence.DrumTrack;
 
-public class DrumMachineModel extends BeatModel implements MetaEventListener {
+public class DrumMachineModel implements MetaEventListener {
 
+    private ArrayList<BeatObserver> beatObservers = new ArrayList<BeatObserver>();
+    private Sequencer sequencer;
+    private Sequence sequence;
+    private DrumTrack[] drumTracks = new DrumTrack[8];
+    private ArrayList<BPMObserver> bpmObservers = new ArrayList<BPMObserver>();
     private int bpm = 60;
+    private int ticksPerBeat = 4;
 
-    @Override
     public void initialize() {
-        setUpMidi();
-        buildTrackAndStart();
+        try {
+            setUpMidi();
+            buildTrack();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        log();
     }
 
-    @Override
-    public void on() {
+    private void log() {
+        System.out.println("log:");
         System.out.println("start: " + sequencer.getTickPosition());
         System.out.println("bpm: " + sequencer.getTempoInBPM());
-        
+        System.out.println("pos: " + sequencer.getTickPosition() + " length: " + sequencer.getTickLength());
+        System.out.println("tempo factor: " + sequencer.getTempoFactor());
+        // System.out.println("loop: " + sequencer.get();
+        // System.out.println("ticksperbeat: " + getTicksPerBeat());
+        System.out.println("endlog\n");
+    }
+
+    public void setUpMidi() throws Exception {
+        sequencer = MidiSystem.getSequencer();
+        sequencer.open();
+        sequencer.addMetaEventListener(this);
+    }
+
+    public void buildTrack() throws InvalidMidiDataException {
+        sequence = new Sequence(Sequence.PPQ, getTicksPerBeat());
+        sequencer.setTempoInBPM(getBpm());
+        drumTracks[0] = new DrumTrack(this);
+        drumTracks[0].getTrack().add(DrumBeat.makeEvent(ShortMessage.PROGRAM_CHANGE, 9, 1, 0, 4));
+        sequencer.setSequence(sequence);
+    }
+
+    public void on() {
+        System.out.println("on: " + sequencer.getTempoInBPM());
+        System.out.println("time: " + Calendar.getInstance().get(Calendar.SECOND));
+        // sequencer.setLoopCount(-1);
         sequencer.start();
     }
 
-    @Override
     public void off() {
         sequencer.stop();
         sequencer.setTickPosition(0);
     }
 
     @Override
-    public void setBPM(int bpm) {
-        this.bpm = bpm;
-        sequencer.setTempoInBPM(getBPM());
-        notifyBPMObservers();
-    }
-
-    @Override
-    public int getBPM() {
-        return bpm;
-    }
-
-    void beatEvent() {
-        notifyBeatObservers();
-    }
-
-    @Override
-    public void registerObserver(BeatObserver o) {
-        beatObservers.add(o);
-    }
-
-    public void notifyBeatObservers() {
-        for (int i = 0; i < beatObservers.size(); i++) {
-            BeatObserver observer = (BeatObserver) beatObservers.get(i);
-            observer.updateBeat();
+    public void meta(MetaMessage message) {
+        log();
+        if (message.getType() == 47) {
+            sequencer.setTickPosition(0);
+            setBpm(getBpm());
+            beatEvent();
+            on();
+            // sequencer.start();
         }
     }
 
-    @Override
+    public Sequencer getSequencer() {
+        return sequencer;
+    }
+
+    public Sequence getSequence() {
+        return sequence;
+    }
+
+    public int getBpm() {
+        System.out.println("getbpm: " + bpm);
+        return bpm;
+    }
+
+    public void setBpm(int bpm) {
+        this.bpm = bpm;
+        sequencer.setTempoInBPM(bpm);
+        notifyBPMObservers();
+    }
+
     public void registerObserver(BPMObserver o) {
         bpmObservers.add(o);
     }
 
-    public void notifyBPMObservers() {
-        for (int i = 0; i < bpmObservers.size(); i++) {
-            BPMObserver observer = (BPMObserver) bpmObservers.get(i);
-            observer.updateBPM();
-        }
-    }
-
-    @Override
-    public void removeObserver(BeatObserver o) {
-        int i = beatObservers.indexOf(o);
-        if (i >= 0) {
-            beatObservers.remove(i);
-        }
-    }
-
-    @Override
     public void removeObserver(BPMObserver o) {
         int i = bpmObservers.indexOf(o);
         if (i >= 0) {
@@ -92,77 +115,39 @@ public class DrumMachineModel extends BeatModel implements MetaEventListener {
         }
     }
 
-    @Override
-    public void meta(MetaMessage message) {
-        System.out.println("pos: " + sequencer.getTickPosition() + " length: " + sequencer.getTickLength());
-        System.out.println("time: " + Calendar.getInstance().get(Calendar.SECOND));
-        if (message.getType() == 47) {
-            sequencer.setTickPosition(0);
-            sequencer.setTempoInBPM(getBPM());
-            beatEvent();
-            //sequencer.start();
+    void beatEvent() {
+        notifyBeatObservers();
+    }
+
+    public void notifyBeatObservers() {
+        for (BeatObserver observer : beatObservers) {
+            observer.updateBeat();
         }
     }
 
-    public void setUpMidi() {
-        try {
-            sequencer = MidiSystem.getSequencer();
-            sequencer.open();
-            sequencer.addMetaEventListener(this);
-            sequence = new Sequence(Sequence.PPQ, 4);
-            track = sequence.createTrack();
-            sequencer.setTempoInBPM(getBPM());
+    public void registerObserver(BeatObserver o) {
+        beatObservers.add(o);
+    }
 
-        } catch (Exception e) {
-            e.printStackTrace();
+    public void removeObserver(BeatObserver o) {
+        int i = beatObservers.indexOf(o);
+        if (i >= 0) {
+            beatObservers.remove(i);
         }
     }
 
-    public void buildTrackAndStart() {
-        int[] trackList = { 60, 0, 46, 0 };
-
-        sequence.deleteTrack(null);
-        track = sequence.createTrack();
-
-        makeTracks(trackList);
-        track.add(makeEvent(ShortMessage.PROGRAM_CHANGE, 9, 1, 0, 4));
-        try {
-            sequencer.setSequence(sequence);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public int getTicksPerBeat() {
+        return ticksPerBeat;
     }
 
-    public void makeTracks(int[] list) {
-
-        for (int i = 0; i < list.length; i++) {
-            int key = list[i];
-
-            if (key != 0) {
-                track.add(makeEvent(ShortMessage.NOTE_ON, 4, key, 100, i));
-                track.add(makeEvent(ShortMessage.NOTE_OFF, 4, key, 100, i + 1));
-            }
-        }
+    public void setTicksPerBeat(int ticksPerBeat) {
+        this.ticksPerBeat = ticksPerBeat;
+        notifyBPMObservers();
     }
 
-    /**
-     * @param command : NOTE_ON could be interpreted as the start of a note whereas NOTE_OFF would be the release.
-     * @param channel : aka 'instrument'.
-     * @param data1 : the pitch of the note being played.
-     * @param data2 : the volume of that note.
-     * @param tick : the number of the beat on which the note will be played.
-     */
-    public MidiEvent makeEvent(int command, int channel, int data1, int data2, int tick) {
-        MidiEvent event = null;
-        try {
-            ShortMessage a = new ShortMessage();
-            a.setMessage(command, channel, data1, data2);
-            event = new MidiEvent(a, tick);
-
-        } catch (Exception e) {
-            e.printStackTrace();
+    public void notifyBPMObservers() {
+        for (BPMObserver observer : bpmObservers) {
+            observer.updateBPM();
         }
-        return event;
     }
-
 }

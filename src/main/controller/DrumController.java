@@ -1,14 +1,14 @@
 package main.controller;
 
-import main.model.BeatModel;
+import main.model.DrumMachineModel;
 import main.view.DrumMachineView;
 
 public class DrumController {
 
-    BeatModel model;
+    DrumMachineModel model;
     DrumMachineView view;
 
-    public DrumController(BeatModel model) {
+    public DrumController(DrumMachineModel model) {
         this.model = model;
         view = new DrumMachineView(this, model);
         model.initialize();
