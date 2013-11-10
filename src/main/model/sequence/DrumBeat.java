@@ -7,9 +7,13 @@ import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiEvent;
 import javax.sound.midi.ShortMessage;
 
+/**
+ * The drum beat is a sound happening at a precise tick on a given track.<br>
+ * With each modification of the settings of the track or beat, the {@link MidiEvent} must be 
+ */
 public class DrumBeat {
 
-    private boolean active = false;
+    private boolean isMuted = false;
     private int tick;
     private DrumTrack drumTrack;
     private MidiEvent midiEventOn;
@@ -26,37 +30,28 @@ public class DrumBeat {
 
     public void setTick(int tick) {
         this.tick = tick;
+    }
+
+    public boolean isMuted() {
+        return isMuted;
+    }
+
+    public void setMuted(boolean muted) {
+        this.isMuted = muted;
+    }
+
+    public void generateEvent() {
         removeOnAndOffEvents();
         addOnAndOffEvents();
     }
 
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        if (!active) {
-            removeOnAndOffEvents();
-        }
-        addOnAndOffEvents();
-        this.active = active;
-    }
-
-    public MidiEvent getMidiEventOn() {
-        return midiEventOn;
-    }
-
-    public MidiEvent getMidiEventOff() {
-        return midiEventOn;
-    }
-
-    public void setMidiEventOn(MidiEvent midiEventOn) {
+    private void setMidiEventOn(MidiEvent midiEventOn) {
         drumTrack.getTrack().remove(this.midiEventOn);
         this.midiEventOn = midiEventOn;
         drumTrack.getTrack().add(midiEventOn);
     }
 
-    public void setMidiEventOff(MidiEvent midiEventOff) {
+    private void setMidiEventOff(MidiEvent midiEventOff) {
         drumTrack.getTrack().remove(this.midiEventOff);
         this.midiEventOff = midiEventOff;
         drumTrack.getTrack().add(midiEventOff);
@@ -72,9 +67,13 @@ public class DrumBeat {
     }
 
     private void addOnAndOffEvents() {
-        setMidiEventOn(makeEvent(NOTE_ON, drumTrack.getChannel(), drumTrack.getPitch(), drumTrack.getVolume(), tick));
-        if (tick < drumTrack.getDrumBeats().size() - 1) {
-            setMidiEventOff(makeEvent(NOTE_OFF, drumTrack.getChannel(), drumTrack.getPitch(), drumTrack.getVolume(), tick + 1));
+        int volume = drumTrack.getVolume();
+        if (isMuted) {
+            volume = 0;
+        }
+        setMidiEventOn(makeEvent(NOTE_ON, drumTrack.getChannel(), drumTrack.getPitch(), volume, tick));
+        if (tick < drumTrack.getTicksPerBeat() - 1) {
+            setMidiEventOff(makeEvent(NOTE_OFF, drumTrack.getChannel(), drumTrack.getPitch(), volume, tick + 1));
         }
     }
 

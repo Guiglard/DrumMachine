@@ -9,13 +9,16 @@ import javax.sound.midi.MetaMessage;
 import javax.sound.midi.MidiSystem;
 import javax.sound.midi.Sequence;
 import javax.sound.midi.Sequencer;
-import javax.sound.midi.ShortMessage;
 
 import main.model.observer.BPMObserver;
 import main.model.observer.BeatObserver;
-import main.model.sequence.DrumBeat;
 import main.model.sequence.DrumTrack;
 
+/**
+ * Class representing the Model (MVC pattern) of the DrumMachine.<br>
+ * The drum machine contains a list of drum tracks which themselves contain a list of drum beats.<br>
+ * This main class contains general settings such as the number of beats per minute (bpm) and the number of ticks per beat.
+ */
 public class DrumMachineModel implements MetaEventListener {
 
     private ArrayList<BeatObserver> beatObservers = new ArrayList<BeatObserver>();
@@ -26,6 +29,10 @@ public class DrumMachineModel implements MetaEventListener {
     private int bpm = 60;
     private int ticksPerBeat = 4;
 
+    /**
+     * Sets up the MIDI by creating and opening the sequencer.<br>
+     * Builds all the drum tracks.
+     */
     public void initialize() {
         try {
             setUpMidi();
@@ -33,37 +40,25 @@ public class DrumMachineModel implements MetaEventListener {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        log();
+        log(0);
     }
 
-    private void log() {
-        System.out.println("log:");
-        System.out.println("start: " + sequencer.getTickPosition());
-        System.out.println("bpm: " + sequencer.getTempoInBPM());
-        System.out.println("pos: " + sequencer.getTickPosition() + " length: " + sequencer.getTickLength());
-        System.out.println("tempo factor: " + sequencer.getTempoFactor());
-        // System.out.println("loop: " + sequencer.get();
-        // System.out.println("ticksperbeat: " + getTicksPerBeat());
-        System.out.println("endlog\n");
-    }
-
-    public void setUpMidi() throws Exception {
+    private void setUpMidi() throws Exception {
         sequencer = MidiSystem.getSequencer();
         sequencer.open();
         sequencer.addMetaEventListener(this);
     }
 
-    public void buildTrack() throws InvalidMidiDataException {
+    private void buildTrack() throws InvalidMidiDataException {
         sequence = new Sequence(Sequence.PPQ, getTicksPerBeat());
         sequencer.setTempoInBPM(getBpm());
         drumTracks[0] = new DrumTrack(this);
-        drumTracks[0].getTrack().add(DrumBeat.makeEvent(ShortMessage.PROGRAM_CHANGE, 9, 1, 0, 4));
+        //drumTracks[0].getTrack().add(DrumBeat.makeEvent(ShortMessage.PROGRAM_CHANGE, 9, 1, 22, getTicksPerBeat()));
         sequencer.setSequence(sequence);
     }
 
     public void on() {
-        System.out.println("on: " + sequencer.getTempoInBPM());
-        System.out.println("time: " + Calendar.getInstance().get(Calendar.SECOND));
+        System.out.println("STARTING AT: " + Calendar.getInstance().get(Calendar.SECOND) + "secs");
         // sequencer.setLoopCount(-1);
         sequencer.start();
     }
@@ -73,9 +68,14 @@ public class DrumMachineModel implements MetaEventListener {
         sequencer.setTickPosition(0);
     }
 
+    /**
+     * Event fired when the sequencer reach the end of the track.<br>
+     * We need to manually start the sequence from the first tick position to loop the pattern.<br>
+     * The use of {@code "LOOP_CONTINUOUSLY"} cannot be used here because the event would never be triggered.
+     */
     @Override
     public void meta(MetaMessage message) {
-        log();
+        log(1);
         if (message.getType() == 47) {
             sequencer.setTickPosition(0);
             setBpm(getBpm());
@@ -149,5 +149,17 @@ public class DrumMachineModel implements MetaEventListener {
         for (BPMObserver observer : bpmObservers) {
             observer.updateBPM();
         }
+    }
+
+    private void log(int type) {
+        if (type == 1) {
+            System.out.println("tick");
+        }
+        System.out.println("log:");
+        System.out.println("start: " + sequencer.getTickPosition());
+        System.out.println("bpm: " + sequencer.getTempoInBPM());
+        System.out.println("pos: " + sequencer.getTickPosition() + " length: " + sequencer.getTickLength());
+        System.out.println("tempo factor: " + sequencer.getTempoFactor());
+        System.out.println("endlog\n");
     }
 }
