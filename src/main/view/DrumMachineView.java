@@ -1,11 +1,12 @@
 package main.view;
 
+import javax.swing.JFrame;
+
 import main.controller.DrumController;
 import main.model.DrumMachineModel;
 import main.model.observer.BPMObserver;
 import main.model.observer.BeatObserver;
 import main.view.panel.DrumPanel;
-import main.view.panel.MainPanel;
 
 public class DrumMachineView implements BeatObserver, BPMObserver {
 
@@ -32,6 +33,7 @@ public class DrumMachineView implements BeatObserver, BPMObserver {
     public void showView() {
         MainWindow w = MainWindow.getInstance();
         w.buildMainWindow();
+        JFrame.setDefaultLookAndFeelDecorated(true);
     }
 
     public DrumMachineModel getBeatModel() {
@@ -50,22 +52,20 @@ public class DrumMachineView implements BeatObserver, BPMObserver {
 
     @Override
     public void updateBeat() {
-        MainPanel currentPanel = MainWindow.getInstance().getCurrentPanel();
-        if (currentPanel instanceof DrumPanel) {
-            ((DrumPanel) currentPanel).getDrumBottomPanel().updateBeat();
-        }
+        DrumPanel currentPanel = (DrumPanel) MainWindow.getInstance().getCurrentPanel();
+        currentPanel.getDrumBottomPanel().getBpmPanel().getBeatBar().setValue(100);
     }
 
     @Override
     public void updateStarted() {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
     public void updateEnded() {
         // TODO Auto-generated method stub
-        
+
     }
 
 }

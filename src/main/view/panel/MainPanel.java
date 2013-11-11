@@ -8,6 +8,7 @@ import main.view.MainWindow;
 public abstract class MainPanel extends JPanel {
 
     public MainPanel() {
+        setSize(MainWindow.getInstance().getSize());
         setPreferredSize(MainWindow.getInstance().getSize());
     }
 

@@ -6,6 +6,8 @@ import static main.Utils.EventMakerUtil.makeEvent;
 
 import javax.sound.midi.MidiEvent;
 
+import main.constants.Constants;
+
 /**
  * The drum beat is a sound happening at a precise tick on a given track.<br>
  * With each modification of the settings of the track or beat, the {@link MidiEvent} must be regenerated.<br>
@@ -52,7 +54,7 @@ public class DrumBeat {
     private void addOnAndOffEvents() {
         int volume = drumTrack.getVolume();
         if (isMuted) {
-            volume = 0;
+            volume = Constants.VOLUME_MIN;
         }
         setMidiEventOn(makeEvent(NOTE_ON, drumTrack.getChannel(), drumTrack.getPitch(), volume, tick));
         if (tick < drumTrack.getTicksPerBeat() - 1) {

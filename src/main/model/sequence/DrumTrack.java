@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import javax.sound.midi.ShortMessage;
 import javax.sound.midi.Track;
 
+import main.constants.Constants;
 import main.model.DrumMachineModel;
 
 /**
@@ -17,9 +18,9 @@ import main.model.DrumMachineModel;
 public class DrumTrack {
 
     private Track track = null;
-    private int channel = 9;
+    private int channel = Constants.PERCUSSION_CHANNEL;
     private int pitch = 36;
-    private int volume = 100;
+    private int volume = Constants.VOLUME_MAX;
     private DrumMachineModel drumMachine;
     private ArrayList<DrumBeat> drumBeats = new ArrayList<>();
 

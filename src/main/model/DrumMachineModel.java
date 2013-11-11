@@ -22,15 +22,26 @@ import main.model.sequence.DrumTrack;
  */
 public class DrumMachineModel implements MetaEventListener, BPMObserver {
 
+    private static DrumMachineModel instance = null;
     private ArrayList<BeatObserver> beatObservers = new ArrayList<BeatObserver>();
     private ArrayList<BPMObserver> bpmObservers = new ArrayList<BPMObserver>();
     private Sequencer sequencer;
     private Sequence sequence;
     private DrumTrack[] drumTracks = new DrumTrack[4];
-    private int bpm = 60;
+    private int bpm = Constants.STARTING_BPM;
     private boolean running = false;
-    private int beatsPerBar = 4;
-    private int ticksPerBeat = 4;
+    private int beatsPerBar = Constants.DEFAULT_BEATS_PER_BAR;
+    private int ticksPerBeat = Constants.DEFAULT_TICKS_PER_BEAT;
+
+    public static DrumMachineModel getInstance() {
+        if (instance == null) {
+            instance = new DrumMachineModel();
+        }
+        return instance;
+    }
+
+    private DrumMachineModel() {
+    }
 
     /**
      * Sets up the MIDI by creating and opening the sequencer.<br>
@@ -60,9 +71,9 @@ public class DrumMachineModel implements MetaEventListener, BPMObserver {
     }
 
     private void buildTracks() throws InvalidMidiDataException {
-        drumTracks[0] = new DrumTrack(this, 100, 35, new boolean[] { true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false });
-        drumTracks[1] = new DrumTrack(this, 100, 42, new boolean[] { false, true, false, true, false, true, false, true, false, true, false, true, false, true, false, true });
-        drumTracks[2] = new DrumTrack(this, 100, 50, new boolean[] { true, false, false, false, true, false, false, false, true, false, false, false, true, false, false, false });
+        drumTracks[0] = new DrumTrack(this, Constants.VOLUME_MAX, 35, new boolean[] { true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false });
+        drumTracks[1] = new DrumTrack(this, Constants.VOLUME_MAX, 42, new boolean[] { false, true, false, true, false, true, false, true, false, true, false, true, false, true, false, true });
+        drumTracks[2] = new DrumTrack(this, Constants.VOLUME_MAX, 50, new boolean[] { true, false, false, false, true, false, false, false, true, false, false, false, true, false, false, false });
         // drumTracks[3] = new DrumTrack(this, 0, 49);
     }
 

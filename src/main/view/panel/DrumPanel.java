@@ -1,5 +1,6 @@
 package main.view.panel;
 
+import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
@@ -28,7 +29,9 @@ public class DrumPanel extends MainPanel {
         drumTopPanel = new DrumTopPanel(this);
         drumStartStopPanel = new DrumMiddlePanel(this);
         drumBottomPanel = new DrumBottomPanel(this);
+        
         buildDrumPanel();
+        setBackground(Color.ORANGE);
     }
 
     private void buildDrumPanel() {

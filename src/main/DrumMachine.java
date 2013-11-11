@@ -13,7 +13,7 @@ public class DrumMachine {
         // Schedule a job for the event-dispatching thread:
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                DrumMachineModel model = new DrumMachineModel();
+                DrumMachineModel model = DrumMachineModel.getInstance();
                 new DrumController(model);
             }
         });
