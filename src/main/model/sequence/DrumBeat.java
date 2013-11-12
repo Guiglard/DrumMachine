@@ -2,7 +2,7 @@ package main.model.sequence;
 
 import static javax.sound.midi.ShortMessage.NOTE_OFF;
 import static javax.sound.midi.ShortMessage.NOTE_ON;
-import static main.Utils.EventMakerUtil.makeEvent;
+import static main.utils.EventMakerUtil.makeEvent;
 
 import javax.sound.midi.MidiEvent;
 

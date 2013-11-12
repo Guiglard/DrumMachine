@@ -1,4 +1,4 @@
-package main.Utils;
+package main.utils;
 
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MetaMessage;
@@ -8,7 +8,7 @@ import javax.sound.midi.ShortMessage;
 public class EventMakerUtil {
 
     /**
-     * @param command
+     * @param command :
      *            NOTE_ON could be interpreted as the start of a note whereas
      *            NOTE_OFF would be the release.
      */
@@ -22,6 +22,10 @@ public class EventMakerUtil {
         return new MidiEvent(a1, tick);
     }
 
+    /**
+     * Returns a meta event.
+     * @param tick : the position, in ticks, of the event in the sequence
+     */
     public static MidiEvent makeMetaEvent(int tick) {
         MetaMessage message = new MetaMessage();
         try {

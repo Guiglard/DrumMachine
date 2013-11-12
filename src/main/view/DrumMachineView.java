@@ -1,12 +1,10 @@
 package main.view;
 
-import javax.swing.JFrame;
-
 import main.controller.DrumController;
 import main.model.DrumMachineModel;
 import main.model.observer.BPMObserver;
 import main.model.observer.BeatObserver;
-import main.view.panel.DrumPanel;
+import main.view.panel.drumpanel.BPMControlsPanel;
 
 public class DrumMachineView implements BeatObserver, BPMObserver {
 
@@ -26,14 +24,18 @@ public class DrumMachineView implements BeatObserver, BPMObserver {
         drumMachineModel = model;
         drumController = controller;
         instance = this;
-        model.registerObserver((BeatObserver) this);
-        model.registerObserver((BPMObserver) this);
+        registerObservers();
+    }
+
+    private void registerObservers() {
+        drumMachineModel.registerObserver((BeatObserver) this);
+        drumMachineModel.registerObserver((BPMObserver) this);
     }
 
     public void showView() {
         MainWindow w = MainWindow.getInstance();
         w.buildMainWindow();
-        JFrame.setDefaultLookAndFeelDecorated(true);
+        // JFrame.setDefaultLookAndFeelDecorated(true);
     }
 
     public DrumMachineModel getBeatModel() {
@@ -46,14 +48,12 @@ public class DrumMachineView implements BeatObserver, BPMObserver {
 
     @Override
     public void updateBPM() {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
     public void updateBeat() {
-        DrumPanel currentPanel = (DrumPanel) MainWindow.getInstance().getCurrentPanel();
-        currentPanel.getDrumBottomPanel().getBpmPanel().getBeatBar().setValue(100);
+        // DrumPanel currentPanel = (DrumPanel) MainWindow.getInstance().getCurrentPanel();
+        // currentPanel.getDrumBottomPanel().getBpmPanel().getBeatBar().setValue(100);
     }
 
     @Override

@@ -2,6 +2,7 @@ package main.model;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MetaEventListener;
@@ -23,8 +24,8 @@ import main.model.sequence.DrumTrack;
 public class DrumMachineModel implements MetaEventListener, BPMObserver {
 
     private static DrumMachineModel instance = null;
-    private ArrayList<BeatObserver> beatObservers = new ArrayList<BeatObserver>();
-    private ArrayList<BPMObserver> bpmObservers = new ArrayList<BPMObserver>();
+    private List<BeatObserver> beatObservers = new ArrayList<>();
+    private List<BPMObserver> bpmObservers = new ArrayList<>();
     private Sequencer sequencer;
     private Sequence sequence;
     private DrumTrack[] drumTracks = new DrumTrack[4];
@@ -121,8 +122,10 @@ public class DrumMachineModel implements MetaEventListener, BPMObserver {
     }
 
     public void setBpm(int bpm) {
-        this.bpm = bpm;
-        sequencer.setTempoInBPM(getBpm());
+        if (bpm > Constants.MIN_BPM && bpm < Constants.MAX_BPM) {
+            this.bpm = bpm;
+            sequencer.setTempoInBPM(getBpm());
+        }
         notifyBPMObservers();
     }
 
@@ -131,7 +134,9 @@ public class DrumMachineModel implements MetaEventListener, BPMObserver {
     }
 
     public void setBeatsPerBar(int beatsPerBar) {
-        this.beatsPerBar = beatsPerBar;
+        if (beatsPerBar > Constants.MIN_BEATS_PER_BAR && beatsPerBar < Constants.MIN_TICKS_PER_BEAT) {
+            this.beatsPerBar = beatsPerBar;
+        }
         notifyBPMObservers();
     }
 
@@ -140,7 +145,9 @@ public class DrumMachineModel implements MetaEventListener, BPMObserver {
     }
 
     public void setTicksPerBeat(int ticksPerBeat) {
-        this.ticksPerBeat = ticksPerBeat;
+        if (ticksPerBeat > Constants.MIN_TICKS_PER_BEAT && ticksPerBeat < Constants.MAX_BEATS_PER_BAR) {
+            this.ticksPerBeat = ticksPerBeat;
+        }
         notifyBPMObservers();
     }
 
@@ -163,7 +170,6 @@ public class DrumMachineModel implements MetaEventListener, BPMObserver {
     private void rebuildTrack() {
         try {
             buildSequence();
-            // buildTracks();
         } catch (InvalidMidiDataException e) {
             e.printStackTrace();
         }

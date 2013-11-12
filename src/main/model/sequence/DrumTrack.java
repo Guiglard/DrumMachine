@@ -1,7 +1,7 @@
 package main.model.sequence;
 
-import static main.Utils.EventMakerUtil.makeEvent;
-import static main.Utils.EventMakerUtil.makeMetaEvent;
+import static main.utils.EventMakerUtil.makeEvent;
+import static main.utils.EventMakerUtil.makeMetaEvent;
 
 import java.util.ArrayList;
 
