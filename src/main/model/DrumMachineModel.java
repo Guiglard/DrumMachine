@@ -55,7 +55,6 @@ public class DrumMachineModel implements MetaEventListener, BPMObserver {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        log(0);
     }
 
     private void setUpMidi() throws Exception {
@@ -72,9 +71,9 @@ public class DrumMachineModel implements MetaEventListener, BPMObserver {
     }
 
     private void buildTracks() throws InvalidMidiDataException {
-        drumTracks[0] = new DrumTrack(this, Constants.VOLUME_MAX, 35, new boolean[] { true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false });
-        drumTracks[1] = new DrumTrack(this, Constants.VOLUME_MAX, 42, new boolean[] { false, true, false, true, false, true, false, true, false, true, false, true, false, true, false, true });
-        drumTracks[2] = new DrumTrack(this, Constants.VOLUME_MAX, 50, new boolean[] { true, false, false, false, true, false, false, false, true, false, false, false, true, false, false, false });
+        drumTracks[0] = new DrumTrack(this, Constants.VOLUME_MAX, 35, new boolean[] { false, true, false, true, false, true, false, true, false, true, false, true, false, true, false, true });
+        drumTracks[1] = new DrumTrack(this, Constants.VOLUME_MAX, 42, new boolean[] { true, false, true, false, true, false, true, false, true, false, true, false, true, false, true, false });
+        //drumTracks[2] = new DrumTrack(this, Constants.VOLUME_MAX, 50, new boolean[] { true, false, false, false, true, false, false, false, true, false, false, false, true, false, false, false });
         // drumTracks[3] = new DrumTrack(this, 0, 49);
     }
 
@@ -102,11 +101,11 @@ public class DrumMachineModel implements MetaEventListener, BPMObserver {
             System.out.println("End of Bar");
             sequencer.setTickPosition(0);
             setBpm(getBpm());
-            beatEvent();
             on();
         } else {
             System.out.println("End of beat");
         }
+        beatEvent();
     }
 
     public Sequencer getSequencer() {
@@ -161,6 +160,11 @@ public class DrumMachineModel implements MetaEventListener, BPMObserver {
 
     public void setRunning(boolean running) {
         this.running = running;
+        if (running) {
+            notifyBeatObservers(Constants.STARTED_EVENT_CODE);
+        } else {
+            notifyBeatObservers(Constants.ENDED_EVENT_CODE);
+        }
     }
 
     private void beatEvent() {
@@ -213,18 +217,6 @@ public class DrumMachineModel implements MetaEventListener, BPMObserver {
         for (BPMObserver observer : bpmObservers) {
             observer.updateBPM();
         }
-    }
-
-    private void log(int type) {
-        // if (type == 1) {
-        // System.out.println("tick");
-        // }
-        // System.out.println("log:");
-        // System.out.println("start: " + sequencer.getTickPosition());
-        // System.out.println("bpm: " + sequencer.getTempoInBPM());
-        // System.out.println("pos: " + sequencer.getTickPosition() + " length: " + sequencer.getTickLength());
-        // System.out.println("tempo factor: " + sequencer.getTempoFactor());
-        // System.out.println("endlog\n");
     }
 
     @Override

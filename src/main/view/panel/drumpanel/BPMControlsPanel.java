@@ -1,6 +1,7 @@
 package main.view.panel.drumpanel;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -8,10 +9,12 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.NumberFormat;
+import java.text.ParseException;
 
 import javax.swing.JButton;
 import javax.swing.JFormattedTextField;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
@@ -19,6 +22,7 @@ import javax.swing.text.PlainDocument;
 import main.controller.DrumController;
 import main.model.DrumMachineModel;
 import main.model.observer.BPMObserver;
+import main.view.controls.StartStopButton;
 
 @SuppressWarnings("serial")
 public class BPMControlsPanel extends JPanel implements ActionListener, PropertyChangeListener, BPMObserver {
@@ -28,8 +32,9 @@ public class BPMControlsPanel extends JPanel implements ActionListener, Property
     private JButton setBPMButton;
     private JButton increaseBPMButton;
     private JButton decreaseBPMButton;
+    private StartStopButton startStopButton;
     private NumberFormat bpmFormat = NumberFormat.getIntegerInstance();
-    // private BeatBar beatBar;
+    private Font font1 = new Font("SansSerif", Font.BOLD, 20);
 
     /** Returns a previously instantiated BPMControlsPanel or fails :) */
     public static BPMControlsPanel getInstance() {
@@ -41,7 +46,7 @@ public class BPMControlsPanel extends JPanel implements ActionListener, Property
 
     public BPMControlsPanel(JPanel parentPanel) {
         super(new GridBagLayout());
-        setBackground(Color.GREEN);
+        setBackground(Color.ORANGE);
         initElements();
         placeElements();
         addListeners();
@@ -49,14 +54,15 @@ public class BPMControlsPanel extends JPanel implements ActionListener, Property
     }
 
     private void initElements() {
-        // beatBar = new BeatBar();
-        // beatBar.setValue(0);
         bpmTextField = new JFormattedTextField(bpmFormat);
         bpmTextField.setValue(DrumMachineModel.getInstance().getBpm());
         bpmTextField.setDocument(new LengthRestrictedDocument(3));
+        bpmTextField.setHorizontalAlignment(JTextField.CENTER);
+        bpmTextField.setFont(font1);
         setBPMButton = new JButton("Set");
         increaseBPMButton = new JButton(">>");
         decreaseBPMButton = new JButton("<<");
+        startStopButton = new StartStopButton();
     }
 
     private void addListeners() {
@@ -73,7 +79,7 @@ public class BPMControlsPanel extends JPanel implements ActionListener, Property
         placeDecreaseBPMButton(constraints);
         placeSetBPMButton(constraints);
         placeIncreaseBPMButton(constraints);
-        // add(beatBar);
+        placeStartStopButton(constraints);
     }
 
     private void placeIncreaseBPMButton(GridBagConstraints constraints) {
@@ -101,23 +107,42 @@ public class BPMControlsPanel extends JPanel implements ActionListener, Property
     }
 
     private void placeBPMTextField(GridBagConstraints constraints) {
-        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.fill = GridBagConstraints.BOTH;
         constraints.ipady = 40;
         constraints.weightx = 0.0;
-        constraints.gridwidth = 3;
+        constraints.gridwidth = 2;
         constraints.gridx = 0;
         constraints.gridy = 0;
         add(bpmTextField, constraints);
         constraints.ipady = 0; // resets it
         constraints.gridwidth = 1;
     }
-    
-    
+
+    private void placeStartStopButton(GridBagConstraints constraints) {
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.gridx = 2;
+        constraints.gridy = 0;
+        constraints.weightx = 0.5;
+        constraints.gridwidth = 1;
+        add(startStopButton, constraints);
+    }
+
+    public void enableControls(boolean b) {
+        bpmTextField.setEnabled(b);
+        setBPMButton.setEnabled(b);
+        increaseBPMButton.setEnabled(b);
+        decreaseBPMButton.setEnabled(b);
+    }
+
     @Override
     public void actionPerformed(ActionEvent event) {
         if (event.getSource() == setBPMButton) {
-            System.out.println("set clicked");
-            bpmSetEvent();
+            try {
+                bpmTextField.commitEdit();
+                bpmSetEvent();
+            } catch (ParseException e) {
+                bpmTextField.setText((String) bpmTextField.getValue());
+            }
         } else if (event.getSource() == increaseBPMButton) {
             System.out.println("increase clicked");
             bpmIncreasedEvent();
@@ -132,11 +157,11 @@ public class BPMControlsPanel extends JPanel implements ActionListener, Property
     @Override
     public void propertyChange(PropertyChangeEvent event) {
         System.out.println("value changed");
-        // bpmSetEvent();
+        bpmSetEvent();
     }
 
     private void bpmSetEvent() {
-        // DrumController.getInstance().setBPM(((Number) bpmTextField.getValue()).intValue());
+        DrumController.getInstance().setBPM(((Number) bpmTextField.getValue()).intValue());
     }
 
     private void bpmIncreasedEvent() {
@@ -164,9 +189,8 @@ public class BPMControlsPanel extends JPanel implements ActionListener, Property
         @Override
         public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
             if (str != null && (getLength() + str.length()) <= limit) {
-                if (str.equals("5")) {
                 super.insertString(offs, str, a);
-            }}
+            }
         }
     }
 

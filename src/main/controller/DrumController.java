@@ -30,13 +30,11 @@ public class DrumController {
     }
     
     public void increaseBPM() {
-        int bpm = model.getBpm();
-        model.setBpm(bpm + 5);
+        model.setBpm(model.getBpm() + 5);
     }
     
     public void decreaseBPM() {
-        int bpm = model.getBpm();
-        model.setBpm(bpm - 5);
+        model.setBpm(model.getBpm() - 5);
     }
   
     public void setBPM(int bpm) {

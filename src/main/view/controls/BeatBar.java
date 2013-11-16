@@ -9,6 +9,7 @@ public class BeatBar extends JProgressBar implements Runnable {
 
     public BeatBar() {
         thread = new Thread(this);
+        setOrientation(JProgressBar.VERTICAL);
         setValue(0);
         setMaximum(100);
         thread.start();
@@ -21,8 +22,9 @@ public class BeatBar extends JProgressBar implements Runnable {
             setValue(value);
             repaint();
             try {
-                Thread.sleep(50);
+                Thread.sleep(40);
             } catch (Exception e) {};
         }
     }
+    
 }
