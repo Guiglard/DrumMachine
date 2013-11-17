@@ -3,9 +3,8 @@ package main.view;
 import main.controller.DrumController;
 import main.model.DrumMachineModel;
 import main.model.observer.BPMObserver;
-import main.model.observer.BeatObserver;
 
-public class DrumMachineView implements BeatObserver, BPMObserver {
+public class DrumMachineView implements BPMObserver {
 
     private DrumMachineModel drumMachineModel;
     private DrumController drumController;
@@ -27,7 +26,6 @@ public class DrumMachineView implements BeatObserver, BPMObserver {
     }
 
     private void registerObservers() {
-        drumMachineModel.registerObserver((BeatObserver) this);
         drumMachineModel.registerObserver((BPMObserver) this);
     }
 
@@ -46,24 +44,6 @@ public class DrumMachineView implements BeatObserver, BPMObserver {
 
     @Override
     public void updateBPM() {
-    }
-
-    @Override
-    public void updateBeat() {
-        // DrumPanel currentPanel = (DrumPanel) MainWindow.getInstance().getCurrentPanel();
-        // currentPanel.getDrumBottomPanel().getBpmPanel().getBeatBar().setValue(100);
-    }
-
-    @Override
-    public void updateStarted() {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void updateEnded() {
-        // TODO Auto-generated method stub
-
     }
 
 }

@@ -7,7 +7,7 @@ import main.model.DrumMachineModel;
 public class TicksPerBeatSlider extends TimeSignatureSlider {
 
     public TicksPerBeatSlider() {
-        super(VERTICAL, Constants.ONE_TICK_PER_BEAT, Constants.SIX_TICKS_PER_BEAT, DrumMachineModel.getInstance().getTicksPerBeat());
+        super(HORIZONTAL, Constants.MIN_TICKS_PER_BEAT, Constants.MAX_TICKS_PER_BEAT, DrumMachineModel.getInstance().getTicksPerBeat());
     }
 
     @Override

@@ -15,9 +15,6 @@ import javax.swing.JButton;
 import javax.swing.JFormattedTextField;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.PlainDocument;
 
 import main.controller.DrumController;
 import main.model.DrumMachineModel;
@@ -49,14 +46,14 @@ public class BPMControlsPanel extends JPanel implements ActionListener, Property
         setBackground(Color.ORANGE);
         initElements();
         placeElements();
-        addListeners();
-        DrumMachineModel.getInstance().registerObserver(this);
+        addListenersAndObservers();
     }
 
     private void initElements() {
         bpmTextField = new JFormattedTextField(bpmFormat);
+        bpmFormat.setMaximumIntegerDigits(3);
+        bpmFormat.setMinimumIntegerDigits(2);
         bpmTextField.setValue(DrumMachineModel.getInstance().getBpm());
-        bpmTextField.setDocument(new LengthRestrictedDocument(3));
         bpmTextField.setHorizontalAlignment(JTextField.CENTER);
         bpmTextField.setFont(font1);
         setBPMButton = new JButton("Set");
@@ -65,12 +62,13 @@ public class BPMControlsPanel extends JPanel implements ActionListener, Property
         startStopButton = new StartStopButton();
     }
 
-    private void addListeners() {
+    private void addListenersAndObservers() {
         setBPMButton.addActionListener(this);
         increaseBPMButton.addActionListener(this);
         decreaseBPMButton.addActionListener(this);
         bpmTextField.addActionListener(this);
         bpmTextField.addPropertyChangeListener("value", this);
+        DrumMachineModel.getInstance().registerObserver(this);
     }
 
     private void placeElements() {
@@ -170,28 +168,6 @@ public class BPMControlsPanel extends JPanel implements ActionListener, Property
 
     private void bpmDecreasedEvent() {
         DrumController.getInstance().decreaseBPM();
-    }
-
-    public class LengthRestrictedDocument extends PlainDocument {
-
-        private int limit;
-
-        public LengthRestrictedDocument(int limit) {
-            super();
-            this.limit = limit;
-        }
-
-        public LengthRestrictedDocument(int limit, boolean upper) {
-            super();
-            this.limit = limit;
-        }
-
-        @Override
-        public void insertString(int offs, String str, AttributeSet a) throws BadLocationException {
-            if (str != null && (getLength() + str.length()) <= limit) {
-                super.insertString(offs, str, a);
-            }
-        }
     }
 
     @Override

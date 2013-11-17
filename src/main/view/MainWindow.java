@@ -3,8 +3,7 @@ package main.view;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 
-import main.view.menu.CommonMenu;
-import main.view.menu.DrumMachineMenu;
+import main.view.menu.EditionMenu;
 import main.view.panel.DrumPanel;
 
 @SuppressWarnings("serial")
@@ -24,9 +23,8 @@ public class MainWindow extends JFrame {
     private MainWindow() {
         setTitle("DrumMachine");
         // setSize(400, 500);
-        // setPreferredSize(new Dimension(400, 500));
         setLocationRelativeTo(null);
-        // setResizable(false);
+        setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
@@ -42,8 +40,7 @@ public class MainWindow extends JFrame {
     }
 
     private void buildMenuBar() {
-        menuBar.add(CommonMenu.getInstance());
-        menuBar.add(DrumMachineMenu.getInstance());
+        menuBar.add(EditionMenu.getInstance());
         this.setJMenuBar(menuBar);
     }
 

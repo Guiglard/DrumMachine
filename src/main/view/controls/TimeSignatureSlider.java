@@ -9,8 +9,8 @@ public abstract class TimeSignatureSlider extends JSlider implements ChangeListe
 
     protected TimeSignatureSlider(int orientation, int min, int max, int init) {
         super(orientation, min, max, init);
-        setMajorTickSpacing(2);
-        setMinorTickSpacing(1);
+        setMajorTickSpacing(1);
+        //setMinorTickSpacing(1);
         setPaintTicks(true);
         setPaintLabels(true);
         addChangeListener(this);
@@ -19,7 +19,6 @@ public abstract class TimeSignatureSlider extends JSlider implements ChangeListe
     public void stateChanged(ChangeEvent e) {
         if (!getValueIsAdjusting()) {
             sliderChanged((int) getValue());
-
         }
     }
 
